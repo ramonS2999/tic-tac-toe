@@ -1,3 +1,5 @@
+import random
+
 # --- Configurações globais ---
 PLAYERS = ["X", "O"]
 WINNING_COMBOS = [
@@ -22,8 +24,16 @@ def win(board):
     """Verifica se existe uma combinação vencedora."""
     return any(board[a] != " " and board[a] == board[b] == board[c] for a, b, c in WINNING_COMBOS)
 
-def get_move(board, current_player):
-    """Solicita e valida a jogada do jogador."""
+def get_move(board, current_player, is_bot=False):
+    """Solicita e valida a jogada do jogador ou bot."""
+    if is_bot:
+        # Escolhe jogada aleatória entre as posições livres
+        free_positions = [i for i, v in enumerate(board) if v == " "]
+        pos = random.choice(free_positions)
+        print(f"\n🤖 Bot ({current_player}) escolheu a posição {pos+1}")
+        return pos
+
+    # Jogada do jogador humano
     while True:
         move = input(f"\nJogador {current_player}, escolha uma posição [1-9]: ")
 
@@ -43,11 +53,19 @@ def main():
     board = [" "] * 9
     turn = 0
 
+    print("=== 🎮 Jogo da Velha ===")
+    mode = input("Digite [1] para 2 jogadores ou [2] para jogar contra o Bot: ")
+
+    vs_bot = (mode == "2")
+
     while True:
         draw(board)
         current_player = PLAYERS[turn % 2]
 
-        pos = get_move(board, current_player)
+        # Se for modo contra bot e jogador da vez for "O", usa jogada automática
+        is_bot_turn = vs_bot and current_player == "O"
+
+        pos = get_move(board, current_player, is_bot=is_bot_turn)
         board[pos] = current_player
         turn += 1
 
