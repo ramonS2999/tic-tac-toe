@@ -1,89 +1,82 @@
 def main():
-    # Variávei de inicialização
     board_game = [" "] * 9
-    char = ["X", "O"]
-    plyer_turn = True
+    players = ["X", "O"]
     turn = 0
-    turn_max = 9
-    player_winner = plyer_turn
 
     while True:
-        if not is_tied(turn, turn_max, board_game):
-            print(f"Turno: Jogador {str(getPayer(plyer_turn))}")
-            print(f"Turno [{turn + 1}]")
-            check = input("Digite uma posição disponível no intervalo de [1-9]: ")
+        draw(board_game)
+        current_player = players[turn % 2]
 
-            if check_list_all(board_game, turn, check, turn_max):
-                board_game[int(check) - 1] = char[getPayer(plyer_turn)- 1]
-                player_winner = plyer_turn
-                plyer_turn = not plyer_turn
-                turn += 1
-                draw(board_game)
+        print(f"\nTurno [{turn + 1}] - Jogador {current_player}")
 
-            if win(board_game):
-                print(f"O Jogador {getPayer(player_winner)} Venceu no Turno [{turn}]!  🎉 🏆 🤩")
-                break
-        else:
+        # Pede a jogada
+        move = input("Digite uma posição disponível no intervalo de [1-9]: ")
+
+        # Validação
+        if not move.isdigit() or int(move) not in range(1, 10):
+            print("❌ Entrada inválida! Digite um número entre 1 e 9.")
+            continue
+
+        pos = int(move) - 1
+        if board_game[pos] != " ":
+            print("❌ Posição já ocupada! Escolha outra.")
+            continue
+
+        # Marca jogada
+        board_game[pos] = current_player
+        turn += 1
+
+        # Verifica vitória
+        if win(board_game):
             draw(board_game)
-            print("VELHA 😥")
+            print(f"🎉 Jogador {current_player} venceu no turno {turn}! 🏆")
+            break
+
+        # Verifica empate
+        if turn == 9:
+            draw(board_game)
+            print("😥 Deu velha!")
             break
 
 # Verifica se teve vencedor
 def win(board_game):
-    hor = ver = dgl = 0
+    # Todas as combinações possíveis de vitória
+    winning_combinations = [
+        [0, 1, 2],  # linha 1
+        [3, 4, 5],  # linha 2
+        [6, 7, 8],  # linha 3
+        [0, 3, 6],  # coluna 1
+        [1, 4, 7],  # coluna 2
+        [2, 5, 8],  # coluna 3
+        [0, 4, 8],  # diagonal principal
+        [2, 4, 6]   # diagonal secundária
+    ]
 
-    for j in range(3):
-        # Hirizontal lines
-        if board_game[hor] != " " and board_game[hor] == board_game[hor + 1] and board_game[hor + 1] == board_game[hor + 2]:
+    for combo in winning_combinations:
+        a, b, c = combo
+        if board_game[a] != " " and board_game[a] == board_game[b] == board_game[c]:
             return True
-        # Vertical lines
-        if board_game[ver] != " " and board_game[ver] == board_game[ver + 3] and board_game[ver + 3] == board_game[ver + 6]:
-            return True 
-        hor += 3
-        ver += 1
+    
+    return False
 
-    # Diagonal lines
-    if board_game[dgl + 2] != " " and board_game[dgl + 2] == board_game[dgl +4] and board_game[dgl + 4] == board_game[dgl + 6]:
-        return True
-    if board_game[dgl] != " " and board_game[dgl] == board_game[dgl + 4] and board_game[dgl + 4] == board_game[dgl + 8]:
-        return True
-
-
-# Retorna o valro do proximo jogar que irá jogar
-def getPayer(turn):
-    return 1 if turn else 2
-
-# Verifica se a casa está disponível
-def is_empty_board(board):
-    return True if board == " " else False
-
-# Checa se o valor digita é menor que 9
-def is_fase_less_9(fase, fase_max):
-    return True if fase < fase_max else False
-
-# Checa várias possibilidades
-def check_list_all(game, fase, check, fase_max):
-     return True if is_range_turn(game, check) and is_fase_less_9(fase, fase_max) and is_empty_board(game[int(check) - 1]) else False
-
-# Verifica se está empatado
-def is_tied(fase, fase_max, game):
-    return True if fase >= fase_max and not win(game) else False
-
-def is_range_turn(game, check):
-    try:
-        return game[int(check) - 1]
-    except:
-        print("Valor incorreto!!!")
-
-# Desenha o tabuleiro
-def draw(game):
-    line1 = " | ".join(game[0:3])
-    line2 = " | ".join(game[3:6])
-    line3 = " | ".join(game[6:9])
+# Desenha o tabuleiro com separadores
+def _draw(board):
     print()
-    print(line1)
-    print(line2)
-    print(line3)
+    for i in range(0, 9, 3):
+        row = " | ".join(board[i:i+3])
+        print(row)
+        if i < 6:
+            print("-" * 10)
+
+# Desenha o tabuleiro com separadores e cores para X e O
+def draw(board):
+    COLORS = {"X": "\033[91mX\033[0m", "O": "\033[94mO\033[0m", " ": " "}
+    print()
+    for i in range(0, 9, 3):
+        row = " | ".join(COLORS[cell] for cell in board[i:i+3])
+        print(row)
+        if i < 6:
+            print("-" * 10)
 
 # Chamado o jogo
 main()
