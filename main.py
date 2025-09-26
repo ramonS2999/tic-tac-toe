@@ -59,15 +59,6 @@ def win(board_game):
     
     return False
 
-# Desenha o tabuleiro com separadores
-def _draw(board):
-    print()
-    for i in range(0, 9, 3):
-        row = " | ".join(board[i:i+3])
-        print(row)
-        if i < 6:
-            print("-" * 10)
-
 # Desenha o tabuleiro com separadores e cores para X e O
 def draw(board):
     COLORS = {"X": "\033[91mX\033[0m", "O": "\033[94mO\033[0m", " ": " "}
