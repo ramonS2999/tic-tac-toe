@@ -56,7 +56,7 @@ def win(board_game):
         a, b, c = combo
         if board_game[a] != " " and board_game[a] == board_game[b] == board_game[c]:
             return True
-    
+
     return False
 
 # Desenha o tabuleiro com separadores e cores para X e O
